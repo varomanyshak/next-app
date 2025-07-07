@@ -1,15 +1,14 @@
 import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
+export async function PUT(req: NextRequest) {
+  const { pathname } = new URL(req.url);
+  const id = pathname.match(/\/tournoi\/([^\/]+)/)?.[1];
+
   if (!id) {
     return NextResponse.json({ message: 'ID requis' }, { status: 400 });
   }
-  const data = await request.json();
+  const data = await req.json();
 
   const updatedTournoi = await prisma.tournament.update({
     where: { id },
@@ -26,11 +25,10 @@ export async function PUT(
   return NextResponse.json(updatedTournoi);
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
+export async function DELETE(req: NextRequest) {
+  const { pathname } = new URL(req.url);
+  const id = pathname.match(/\/tournoi\/([^\/]+)/)?.[1];
+
   if (!id) {
     return NextResponse.json({ message: 'ID requis' }, { status: 400 });
   }
