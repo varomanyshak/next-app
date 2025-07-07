@@ -2,11 +2,18 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
   try {
+    const { pathname } = new URL(req.url);
+    const id = pathname.match(/\/competiteur\/([^\/]+)/)?.[1];
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID requis' }, { status: 400 });
+    }
+
     const data = await req.json();
     const updated = await prisma.competitor.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         firstname: data.firstname,
         lastname: data.lastname,
@@ -24,10 +31,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest) {
   try {
+    const { pathname } = new URL(req.url);
+    const id = pathname.match(/\/competiteur\/([^\/]+)/)?.[1];
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID requis' }, { status: 400 });
+    }
+
     await prisma.competitor.update({
-      where: { id: params.id },
+      where: { id },
       data: { hidden: true }, // Soft delete by setting hidden to true (1)
     });
     return NextResponse.json({ message: 'Compétiteur supprimé' });
