@@ -1,0 +1,132 @@
+// Datasource et générateur
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  password String
+  role     String
+
+  Tournament Tournament[] @relation("UserTournaments")
+  Competitor Competitor[] @relation("UserCompetitors")
+}
+
+model Tournament {
+  id         String   @id @default(uuid())
+  name       String
+  city       String
+  club       String
+  start_date DateTime
+  end_date   DateTime
+  user_id    Int
+  hidden     Boolean  @default(false)
+
+  User     User       @relation("UserTournaments", fields: [user_id], references: [id])
+  Category Category[]
+  matches  Match[] // <--- Add here!
+
+  @@map("tournament")
+}
+
+model Competitor {
+  id        String   @id @default(uuid())
+  firstname String
+  lastname  String
+  birthday  DateTime
+  club      String
+  country   String
+  weight    Int
+  rank      String
+  gender    String
+  user_id   Int
+  hidden    Boolean  @default(false)
+
+  User User @relation("UserCompetitors", fields: [user_id], references: [id])
+
+  // Relations inverses pour Match
+  matches1 Match[] @relation("Competitor1Match")
+  matches2 Match[] @relation("Competitor2Match")
+  wins     Match[] @relation("WinnerMatch")
+
+  @@map("competitor")
+}
+
+model AgeGroup {
+  id      Int    @id @default(autoincrement())
+  name    String
+  age_min Int
+  age_max Int
+
+  weightCategories WeightCategory[]
+  Category         Category[]
+
+  @@map("age_group")
+}
+
+model WeightCategory {
+  id           Int    @id @default(autoincrement())
+  name         String
+  weight_min   Int
+  weight_max   Int
+  age_group_id Int
+  gender       String
+
+  ageGroup AgeGroup   @relation(fields: [age_group_id], references: [id])
+  Category Category[]
+
+  @@map("weight_category")
+}
+
+model Category {
+  id                 Int     @id @default(autoincrement())
+  name               String
+  rank               String
+  gender             String
+  tournament_id      String
+  weight_category_id Int
+  age_group_id       Int
+  hidden             Boolean @default(false) // ✅ Ce champ est requis
+
+  tournament     Tournament     @relation(fields: [tournament_id], references: [id])
+  weightCategory WeightCategory @relation(fields: [weight_category_id], references: [id])
+  ageGroup       AgeGroup       @relation(fields: [age_group_id], references: [id])
+  matches        Match[]
+
+  @@map("category")
+}
+model Match {
+  id              Int         @id @default(autoincrement())
+  category_id     Int
+  round           Int
+
+  // ⬇️ Rendre les IDs optionnels
+  competitor1_id  String?
+  competitor2_id  String?
+
+  score1          Int         @default(0)
+  score2          Int         @default(0)
+  winner_id       String?
+  status          String      @default("pending")
+  keikuka1        Int?
+  keikuka2        Int?
+
+  tournament_id   String
+  tournament      Tournament  @relation(fields: [tournament_id], references: [id])
+  category        Category    @relation(fields: [category_id], references: [id])
+
+  // ⬇️ Rendre les relations optionnelles
+  competitor1     Competitor? @relation("Competitor1Match", fields: [competitor1_id], references: [id])
+  competitor2     Competitor? @relation("Competitor2Match", fields: [competitor2_id], references: [id])
+  winner          Competitor? @relation("WinnerMatch", fields: [winner_id], references: [id])
+
+  @@map("match")
+}
+
