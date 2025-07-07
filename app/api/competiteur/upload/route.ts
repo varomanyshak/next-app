@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
       readStream
         .pipe(csv())
-        .on("data", (row) => rows.push(row))
+        .on("data", (row: Record<string, any>) => rows.push(row))
         .on("end", resolve)
         .on("error", reject);
     });
