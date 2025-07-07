@@ -3,10 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const id = params.id;
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID requis' }, { status: 400 });
+    }
+
     const data = await req.json();
 
     const updatedTournoi = await prisma.tournament.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: data.name,
         city: data.city,
@@ -24,10 +30,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ message: 'Erreur lors de la mise à jour' }, { status: 500 });
   }
 }
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+
+export async function DELETE(req: NextRequest) {
   try {
+    const { pathname } = new URL(req.url);
+    const id = pathname.match(/\/tournoi\/([^\/]+)/)?.[1];
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID requis' }, { status: 400 });
+    }
+
     await prisma.tournament.update({
-      where: { id: params.id },
+      where: { id },
       data: { hidden: true }, // 👈 suppression logique
     });
     return NextResponse.json({ message: 'Tournoi marqué comme supprimé' });
