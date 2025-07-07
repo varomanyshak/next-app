@@ -10,17 +10,17 @@ export async function POST(req: Request) {
     const csvString = buffer.toString();
 
     // Parse CSV
-    const rows: any[] = [];
-    await new Promise((resolve, reject) => {
-      const stream = require("stream");
-      const readStream = new stream.Readable();
+    const rows: Record<string, string>[] = [];
+    await new Promise<void>(async (resolve, reject) => {
+      const stream = (await import("stream")).Readable;
+      const readStream = new stream();
       readStream._read = () => {};
       readStream.push(csvString);
       readStream.push(null);
 
       readStream
         .pipe(csv())
-        .on("data", (row: Record<string, any>) => rows.push(row))
+        .on("data", (row: Record<string, string>) => rows.push(row))
         .on("end", resolve)
         .on("error", reject);
     });

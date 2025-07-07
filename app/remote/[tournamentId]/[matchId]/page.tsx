@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 interface Match {
   id: number;
   competitor1_id: string;
   competitor2_id: string;
+  round?: number;
 }
 
 interface Competitor {
@@ -16,8 +17,8 @@ interface Competitor {
 }
 
 export default function RemoteControlPage() {
-  const { tournamentId, matchId } = useParams() as { tournamentId: string; matchId: string };
-  const router = useRouter();
+  const { matchId } = useParams() as { tournamentId: string; matchId: string };
+  // const router = useRouter();
 
   const [match, setMatch] = useState<Match | null>(null);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
@@ -62,7 +63,7 @@ export default function RemoteControlPage() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning]);
+  }, [isRunning, time]);
 
   const formatTime = (t: number) =>
     `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;

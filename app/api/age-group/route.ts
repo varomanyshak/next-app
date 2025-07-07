@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const data = await prisma.ageGroup.findMany();
     return NextResponse.json(data);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ message: 'Erreur de récupération' }, { status: 500 });
   }
 }

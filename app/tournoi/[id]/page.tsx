@@ -31,7 +31,7 @@ type Competitor = {
 
 export default function TournamentDetailsPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = params && 'id' in params ? params.id as string : '';
   const userId = 1; // Replace with real userId from auth/session
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -157,7 +157,7 @@ export default function TournamentDetailsPage() {
   // Handler: Preview ALL competitors matching any category of this tournament
   const handlePreviewAllCompetitors = () => {
     // For each category, filter matching competitors (by rank, gender, <=5 years old)
-    let matches: Competitor[] = [];
+    const matches: Competitor[] = [];
     categories.forEach(category => {
       matches.push(
         ...competitors.filter(comp =>
@@ -252,7 +252,7 @@ const handleStartTournament = async () => {
           className="bg-[#393c4d] text-white px-4 py-2 rounded border border-black hover:bg-[#2c2e3a]"
           onClick={handlePreviewAllCompetitors}
         >
-          Prévisualiser les compétiteurs
+          Prévisualiser les comp&eacute;titeurs
         </button>
       </div>
 
@@ -384,7 +384,7 @@ const handleStartTournament = async () => {
                 </select>
               </div>
               <div>
-                <label className="block mb-1 font-semibold">Groupe d'âge</label>
+                <label className="block mb-1 font-semibold">Groupe d&apos;âge</label>
                 <select
                   className="border px-2 py-1 rounded w-full"
                   value={newCategory.age_group_id}

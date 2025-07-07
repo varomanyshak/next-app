@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export default function PageCompetiteur() {
-  const [competiteurs, setCompetiteurs] = useState<any[]>([]);
+  const [competiteurs, setCompetiteurs] = useState<Array<{ [key: string]: unknown }>>([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -92,23 +92,24 @@ export default function PageCompetiteur() {
     setShowModal(true);
   };
 
-  const openEditModal = (competiteur: any) => {
+  const openEditModal = (competiteur: { [key: string]: unknown }) => {
     setIsEditing(true);
-    setEditId(competiteur.id);
+    setEditId(typeof competiteur.id === 'string' ? competiteur.id : null);
     setForm({
-      firstname: competiteur.firstname,
-      lastname: competiteur.lastname,
-      birthday: competiteur.birthday.split('T')[0],
-      club: competiteur.club,
-      country: competiteur.country,
-      weight: competiteur.weight,
-      rank: competiteur.rank,
-      gender: competiteur.gender,
+      firstname: typeof competiteur.firstname === 'string' ? competiteur.firstname : '',
+      lastname: typeof competiteur.lastname === 'string' ? competiteur.lastname : '',
+      birthday: typeof competiteur.birthday === 'string' ? competiteur.birthday.split('T')[0] : '',
+      club: typeof competiteur.club === 'string' ? competiteur.club : '',
+      country: typeof competiteur.country === 'string' ? competiteur.country : '',
+      weight: typeof competiteur.weight === 'string' ? competiteur.weight : '',
+      rank: typeof competiteur.rank === 'string' ? competiteur.rank : '',
+      gender: typeof competiteur.gender === 'string' ? competiteur.gender : '',
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: unknown) => {
+    if (typeof id !== 'string') return;
     if (!confirm('Confirmer la suppression de ce compétiteur ?')) return;
     const res = await fetch(`/api/competiteur/${id}`, {
       method: 'PUT',
@@ -116,7 +117,7 @@ export default function PageCompetiteur() {
       body: JSON.stringify({ hidden: true }),
     });
     if (res.ok) {
-      setCompetiteurs((prev) => prev.filter((c) => c.id !== id));
+      setCompetiteurs((prev) => prev.filter((c) => (typeof c.id === 'string' ? c.id : undefined) !== id));
     } else {
       alert('Erreur lors de la suppression');
     }
@@ -189,25 +190,25 @@ export default function PageCompetiteur() {
         </thead>
         <tbody>
           {competiteurs.map((c) => (
-            <tr key={c.id}>
-              <td className="border px-2 py-1">{c.lastname}</td>
-              <td className="border px-2 py-1">{c.firstname}</td>
-              <td className="border px-2 py-1">{new Date(c.birthday).toLocaleDateString('fr-FR')}</td>
-              <td className="border px-2 py-1">{c.club}</td>
-              <td className="border px-2 py-1">{c.country}</td>
-              <td className="border px-2 py-1">{c.weight}</td>
-              <td className="border px-2 py-1">{c.rank}</td>
-              <td className="border px-2 py-1">{c.gender}</td>
+            <tr key={typeof c.id === 'string' ? c.id : undefined}>
+              <td className="border px-2 py-1">{typeof c.lastname === 'string' ? c.lastname : ''}</td>
+              <td className="border px-2 py-1">{typeof c.firstname === 'string' ? c.firstname : ''}</td>
+              <td className="border px-2 py-1">{typeof c.birthday === 'string' ? new Date(c.birthday).toLocaleDateString('fr-FR') : ''}</td>
+              <td className="border px-2 py-1">{typeof c.club === 'string' ? c.club : ''}</td>
+              <td className="border px-2 py-1">{typeof c.country === 'string' ? c.country : ''}</td>
+              <td className="border px-2 py-1">{typeof c.weight === 'string' ? c.weight : ''}</td>
+              <td className="border px-2 py-1">{typeof c.rank === 'string' ? c.rank : ''}</td>
+              <td className="border px-2 py-1">{typeof c.gender === 'string' ? c.gender : ''}</td>
               <td className="border px-2 py-1 flex space-x-1">
                 <button
                   onClick={() => openEditModal(c)}
-                  className="px-2 py-1 bg-[#393c4d] text-white rounded hover:bg-[#2c2e3a] border border-black"
+                  className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                   Modifier
                 </button>
                 <button
                   onClick={() => handleDelete(c.id)}
-                  className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Supprimer
                 </button>

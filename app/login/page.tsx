@@ -44,7 +44,7 @@ export default function LoginPage() {
 
       // Rediriger
       router.push('/tournoi');
-    } catch (err) {
+    } catch {
       setError('Une erreur est survenue lors de la connexion.');
     }
   };
