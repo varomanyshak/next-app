@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 type Category = {
   id: number;
@@ -28,8 +29,9 @@ type Competitor = {
   hidden: boolean;
 };
 
-export default function TournamentDetailsPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function TournamentDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
   const userId = 1; // Replace with real userId from auth/session
 
   const [categories, setCategories] = useState<Category[]>([]);
