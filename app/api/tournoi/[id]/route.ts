@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const id = context.params.id;
+  const id = params.id;
   if (!id) {
     return NextResponse.json({ message: 'ID requis' }, { status: 400 });
   }
@@ -28,9 +28,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const id = context.params.id;
+  const id = params.id;
   if (!id) {
     return NextResponse.json({ message: 'ID requis' }, { status: 400 });
   }
