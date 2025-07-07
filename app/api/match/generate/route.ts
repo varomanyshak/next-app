@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     for (const cat of categories) {
       // Find all competitors for this category (by rank+gender, as in your frontend)
       const group = competitors.filter(
-        c =>
+        (c: any) =>
           c.rank.toLowerCase().trim() === cat.rank.toLowerCase().trim() &&
           c.gender === cat.gender
       );
