@@ -1,11 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import { NextResponse, type NextRequest } from 'next/server';
-import type { RouteHandlerContext } from 'next/dist/server/web/types';
+import { NextResponse } from 'next/server';
 
 // ✅ PUT: Update a tournament by ID
 export async function PUT(
-  request: NextRequest,
-  context: RouteHandlerContext<{ id: string }>
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
@@ -40,8 +39,8 @@ export async function PUT(
 
 // ✅ DELETE: Soft delete a tournament by ID
 export async function DELETE(
-  request: NextRequest,
-  context: RouteHandlerContext<{ id: string }>
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
