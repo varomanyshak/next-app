@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+// ✅ PUT: Update a tournament by ID
+export async function PUT(request: Request, context: { params: { id: string } }) {
   try {
-    const id = params.id;
+    const { id } = context.params;
     if (!id) {
       return NextResponse.json({ message: 'ID requis' }, { status: 400 });
     }
+
     const data = await request.json();
 
     const updatedTournoi = await prisma.tournament.update({
@@ -17,7 +19,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         club: data.club,
         start_date: new Date(data.start_date),
         end_date: new Date(data.end_date),
-        // This ensures Prisma doesn't fail if `user_id` is required
+        // Optional field
         ...(data.user_id && { user_id: Number(data.user_id) }),
       },
     });
@@ -29,21 +31,22 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request) {
+// ✅ DELETE: Soft delete a tournament by ID
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   try {
-    const { pathname } = new URL(request.url);
-    const id = pathname.match(/\/tournoi\/([^\/]+)/)?.[1];
-
+    const { id } = context.params;
     if (!id) {
       return NextResponse.json({ message: 'ID requis' }, { status: 400 });
     }
 
     await prisma.tournament.update({
       where: { id },
-      data: { hidden: true }, // 👈 suppression logique
+      data: { hidden: true }, // 👈 Soft delete
     });
+
     return NextResponse.json({ message: 'Tournoi marqué comme supprimé' });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ message: 'Erreur de suppression' }, { status: 500 });
   }
 }
