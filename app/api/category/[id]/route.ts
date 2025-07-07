@@ -10,12 +10,16 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ message: 'ID requis' }, { status: 400 });
     }
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ message: 'ID invalide' }, { status: 400 });
+    }
 
     const body = await req.json();
     const { name, rank, gender, tournament_id, weight_category_id, age_group_id } = body;
 
     const updatedCategory = await prisma.category.update({
-      where: { id },
+      where: { id: numericId },
       data: {
         name,
         rank,
@@ -45,10 +49,14 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ message: 'ID requis' }, { status: 400 });
     }
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ message: 'ID invalide' }, { status: 400 });
+    }
 
     // Soft delete (update `hidden` to true)
     const deletedCategory = await prisma.category.update({
-      where: { id },
+      where: { id: numericId },
       data: { hidden: true },
     });
 
