@@ -3,9 +3,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma"; // Adjust if you use another DB setup
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest) {
   try {
-    const matchId = params.id;
+    const { pathname } = new URL(req.url);
+    const matchId = pathname.match(/\/match\/([^\/]+)/)?.[1];
+
+    if (!matchId) {
+      return NextResponse.json({ error: "ID requis" }, { status: 400 });
+    }
+
     const { score1, score2, winnerId } = await req.json();
 
     // Fetch the match to get context
